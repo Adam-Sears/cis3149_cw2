@@ -7,5 +7,9 @@ Created on Fri Mar  6 14:47:07 2020
 Last edit by Adam Sears on Fri Mar  6 14:48:07 2020
 """
 
+
+while (True):
+    print("test")
+
 ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
