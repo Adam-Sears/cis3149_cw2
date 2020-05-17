@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-Created on Fri Mar  6 14:47:07 2020
+Created on Fri Mar 6 14:47:07 2020
 @author: Dakota Hampson, Adam Sears
-Last edit by Adam Sears on Fri May 15 11:02:43 2020
+Last edit by Adam Sears on Sun May 17 19:53:40 2020
 """
 
 import cv2
@@ -23,79 +23,60 @@ hand = cv2.CascadeClassifier('haarcascades/Hand.Cascade.1.xml')
 fist = cv2.CascadeClassifier('haarcascades/fist.xml')
 
 #Create array of shapes and coordinates
-pts = np.array([[5,350],[5,450],[305,450]], np.int32)
+pts = np.array([[5,240],[55,340],[55,140]], np.int32)
 pts = pts.reshape((-1,1,2))
 back_arrow = {
-'pts' : pts,
-'thickness' : 2,
-'startEnd' : (5,350,305,450)
+    'pts' : pts,
+    'startEnd' : (5,140,105,340)
 }
 
-pts = np.array([[5,350],[5,450],[305,450]], np.int32)
+pts = np.array([[635,240],[585,140],[585,340]], np.int32)
 pts = pts.reshape((-1,1,2))
 next_arrow = {
-        'pts' : pts,
-        'thickness' : 2,
-        'startEnd' : (5,350,305,450)
+    'pts' : pts,
+    'startEnd' : (535,140,635,340)
 }
 
 menu_item_0 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (85,5),
+    'end' : (285,105),
+    'startEnd' : (85,5,285,105)
 }
 
-pts = np.array([[5,350],[5,450],[305,450]], np.int32)
-pts = pts.reshape((-1,1,2))
 menu_item_1 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (355,5),
+    'end' : (555,105),
+    'startEnd' : (355,5,555,105)
 }
 
 menu_item_2 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (85,190),
+    'end' : (285,290),
+    'startEnd' : (85,190,285,290)
 }
 
 menu_item_3 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (355,190),
+    'end' : (555,290),
+    'startEnd' : (355,190,555,290)
 }
 
 menu_item_4 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (85,375),
+    'end' : (285,475),
+    'startEnd' : (85,375,285,475)
 }
 
 menu_item_5 = {
-        'start' : (5,5),
-        'end' : (205,205),
-        'thickness' : 2,
-        'startEnd' : (5,5,205,205)
+    'start' : (355,375),
+    'end' : (555,475),
+    'startEnd' : (355,375,555,475)
 }
 
-menu_shapes = {
-        'back_arrow' : back_arrow,
-        'next_arrow' : next_arrow,
-        'item0' : menu_item_0,
-        'item1' : menu_item_1,
-        'item2' : menu_item_2,
-        'item3' : menu_item_3,
-        'item4' : menu_item_4,
-        'item5' : menu_item_5
-}
+menu_shapes = [menu_item_0, menu_item_1, menu_item_2, menu_item_3, menu_item_4, menu_item_5, back_arrow, next_arrow]
 
-menu_item = dict()
-temp_menu = dict()
+menu_item = []
+temp_menu = []
 temp_menu.append("if")
 temp_menu.append("if")
 temp_menu.append("if")
@@ -103,7 +84,7 @@ temp_menu.append("if")
 temp_menu.append("if")
 temp_menu.append("if")
 menu_item.append(temp_menu)
-temp_menu = dict()
+temp_menu = []
 temp_menu.append("if")
 temp_menu.append("if")
 temp_menu.append("if")
@@ -130,11 +111,11 @@ while camera.isOpened():
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
         #Draw shapes on camera image
-        cv2.fillPoly(img,[menu_shapes['back_arrow']['pts']],(0,0,255))
-        cv2.fillPoly(img,[menu_shapes['next_arrow']['pts']],(0,0,255))
+        cv2.fillPoly(img,[menu_shapes[6]['pts']],(255,0,0))
+        cv2.fillPoly(img,[menu_shapes[7]['pts']],(255,0,0))
         for i in range(6):
-            img = cv2.rectangle(img,menu_shapes['item'+i]['start'],menu_shapes['item1']['end'],(0,0,255),menu_shapes['item1']['thickness'])
-            img = cv2.putText(img,menu_item[menu_page][i],(400,450),cv2.FONT_HERSHEY_DUPLEX,1,(0,0,255))
+            img = cv2.rectangle(img,menu_shapes[i]['start'],menu_shapes[i]['end'],(128,0,0),-1)
+            img = cv2.putText(img,menu_item[menu_page][i],menu_shapes[i]['end'],cv2.FONT_HERSHEY_DUPLEX,1,(255,255,255))
         
         #Detect body parts
         palms = hand.detectMultiScale(gray, 1.3, 5)
@@ -171,7 +152,7 @@ while camera.isOpened():
         #
         """
         
-        cv2.imshow('Task 4', img)
+        cv2.imshow('Gesture controlled programming software', img)
         
         k = cv2.waitKey(10)
         if k == 27:  # press ESC to exit
@@ -183,12 +164,10 @@ while camera.isOpened():
         #If body part(s) detected set "previous state" boolean to true, if none set to false
         palmsBool = True if palmsCount > 0 else False
         fistsBool = True if fistsCount > 0 else False
-        facesBool = True if facesCount > 0 else False
             
         #Clear current counts
         palmsCount = 0
         fistsCount = 0
-        facesCount = 0
         """
         #
         """
