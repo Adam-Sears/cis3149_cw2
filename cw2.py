@@ -2,7 +2,7 @@
 """
 Created on Fri Mar 6 14:47:07 2020
 @author: Dakota Hampson, Adam Sears
-Last edit by Adam Sears on Mon May 18 16:47:13 2020
+Last edit by Adam Sears on Mon May 18 17:44:49 2020
 """
 
 import cv2
@@ -91,9 +91,11 @@ menu_shapes = [menu_item_0, menu_item_1, menu_item_2, menu_item_3, menu_item_4, 
 numbers_menu = [[205,395,305,475,245,425],[5,5,105,85,45,35],[205,5,305,85,245,35],[405,5,505,85,445,35],[5,135,105,215,45,165],[205,135,305,215,245,165],[405,135,505,215,445,165],[5,265,105,345,45,295],[205,265,305,345,245,295],[405,265,505,345,445,295]]
 
 menu_item = []
-menu_item.append(["end line","delete current line","delete last line","backspace","NULL","execute"]) #Page 0
+menu_item.append(["end line","delete current line","delete last line","backspace","space","execute"]) #Page 0
 menu_item.append(["if","while","print","number","variable","not"]) #Page 1
-menu_item.append(["=","+","-",")","]","}"]) #Page 2
+menu_item.append(["True","False","!","=","+","-"]) #Page 2
+menu_item.append(["(",")","[","]","{","}"]) #Page 3
+menu_item.append([":","None",'"',"'","",""]) #Page 3 #Quotes changed to allow entry of "
 
 menu_page = 0
 action = ""
@@ -106,6 +108,7 @@ executable_string = ""
 #Previous state
 palms_bool = False
 fists_bool = False
+selected_bool = True
 
 #Current count
 palms_count = 0
@@ -160,10 +163,12 @@ while camera.isOpened():
                             if i < 6:
                                 #Menu option selected    
                                 play_obj = high_wav.play()
+                                play_obj.wait_done()
                                 action = i
                             else:
                                 #Arrow selected
                                 play_obj = low_wav.play()
+                                play_obj.wait_done()
                                 if i == 6:
                                     action = "back"
                                 elif i == 7:
@@ -226,6 +231,8 @@ while camera.isOpened():
                 else:
                     img = cv2.putText(img,"Syntax error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
                     print("Syntax error - Cannot backspace")
+            elif menu_item[menu_page][action] == "space":
+                temp_code += " "
             elif menu_item[menu_page][action] == "execute":
                 if code:
                     for i in range(len(code)):
@@ -237,49 +244,63 @@ while camera.isOpened():
                     img = cv2.putText(img,"Syntax error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
                     print("Syntax error - Cannot execute")
             elif menu_item[menu_page][action] == "if":
-                if temp_code == "":
-                    temp_code += "if "
-                else:
-                    img = cv2.putText(img,"Syntax error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
-                    print("Syntax error - Cannot insert if")
+                temp_code += "if "
             elif menu_item[menu_page][action] == "while":
-                if temp_code == "":
-                    temp_code += "while "
-                else:
-                    img = cv2.putText(img,"Syntax error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
-                    print("Syntax error - Cannot insert while")
+                temp_code += "while "
             elif menu_item[menu_page][action] == "print":
-                if temp_code == "":
-                    temp_code += "print("
-                else:
-                    img = cv2.putText(img,"Syntax error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
-                    print("Syntax error - Cannot insert print")
+                temp_code += "print("
             elif menu_item[menu_page][action] == "number":
                 change_menu = "number"
-            elif menu_item[menu_page][action] == "variable":
-                change_menu = "variable"
+            #elif menu_item[menu_page][action] == "variable":
+                #change_menu = "variable"
             elif menu_item[menu_page][action] == "not":
                 temp_code += "not"
+            elif menu_item[menu_page][action] == "True":
+                temp_code += "True"
+            elif menu_item[menu_page][action] == "False":
+                temp_code += "False"
+            elif menu_item[menu_page][action] == "!":
+                temp_code += "!"
             elif menu_item[menu_page][action] == "=":
                 temp_code += "="
             elif menu_item[menu_page][action] == "+":
                 temp_code += "+"
             elif menu_item[menu_page][action] == "-":
                 temp_code += "-"
+            elif menu_item[menu_page][action] == "(":
+                temp_code += "("
             elif menu_item[menu_page][action] == ")":
                 temp_code += ")"
+            elif menu_item[menu_page][action] == "[":
+                temp_code += "["
             elif menu_item[menu_page][action] == "]":
                 temp_code += "]"
+            elif menu_item[menu_page][action] == "{":
+                temp_code += "{"
             elif menu_item[menu_page][action] == "}":
                 temp_code += "}"
+            elif menu_item[menu_page][action] == ":":
+                temp_code += ":"
+            elif menu_item[menu_page][action] == "None":
+                temp_code += "None"
+            elif menu_item[menu_page][action] == '"': #Quotes changed to allow entry of "
+                temp_code += '"'
+            elif menu_item[menu_page][action] == "'":
+                temp_code += "'"
             else:
                 img = cv2.putText(img,"Handling error",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,red)
                 print("Error - Command not handled")
+        else:
+            selected_bool = False
         """
         #
         """
-        print(temp_code)
-        print(code)
+        if selected_bool:
+            print("---")
+            print(temp_code)
+            print(code)
+            print("---")
+        selected_bool = True
         """
         #Set variables for next stage of while loop
         """
