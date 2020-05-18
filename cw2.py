@@ -2,7 +2,7 @@
 """
 Created on Fri Mar 6 14:47:07 2020
 @author: Dakota Hampson, Adam Sears
-Last edit by Adam Sears on Sun May 17 19:53:40 2020
+Last edit by Adam Sears on Mon May 18 02:48:36 2020
 """
 
 import cv2
@@ -23,77 +23,70 @@ hand = cv2.CascadeClassifier('haarcascades/Hand.Cascade.1.xml')
 fist = cv2.CascadeClassifier('haarcascades/fist.xml')
 
 #Create array of shapes and coordinates
-pts = np.array([[5,240],[55,340],[55,140]], np.int32)
-pts = pts.reshape((-1,1,2))
+pts = np.array([[5,240],[105,340],[105,140]], np.int32)
+pts = pts.reshape([-1,1,2])
 back_arrow = {
-    'pts' : pts,
-    'startEnd' : (5,140,105,340)
+    'pts': pts,
+    'startEnd': [5,140,105,340]
 }
 
-pts = np.array([[635,240],[585,140],[585,340]], np.int32)
-pts = pts.reshape((-1,1,2))
+pts = np.array([[635,240],[535,140],[535,340]], np.int32)
+pts = pts.reshape([-1,1,2])
 next_arrow = {
-    'pts' : pts,
-    'startEnd' : (535,140,635,340)
+    'pts': pts,
+    'startEnd': [535,140,635,340]
 }
 
 menu_item_0 = {
-    'start' : (85,5),
-    'end' : (285,105),
-    'startEnd' : (85,5,285,105)
+    'start': (135,5),
+    'end': (310,105),
+    'startEnd': [135,5,310,105],
+    'textPos': (145,65)
 }
 
 menu_item_1 = {
-    'start' : (355,5),
-    'end' : (555,105),
-    'startEnd' : (355,5,555,105)
+    'start': (330,5),
+    'end': (505,105),
+    'startEnd': [330,5,505,105],
+    'textPos': (340,65)
 }
 
 menu_item_2 = {
-    'start' : (85,190),
-    'end' : (285,290),
-    'startEnd' : (85,190,285,290)
+    'start': (135,190),
+    'end': (310,290),
+    'startEnd': [135,190,310,290],
+    'textPos': (145,250)
 }
 
 menu_item_3 = {
-    'start' : (355,190),
-    'end' : (555,290),
-    'startEnd' : (355,190,555,290)
+    'start': (330,190),
+    'end': (505,290),
+    'startEnd': [330,190,505,290],
+    'textPos': (340,250)
 }
 
 menu_item_4 = {
-    'start' : (85,375),
-    'end' : (285,475),
-    'startEnd' : (85,375,285,475)
+    'start': (135,375),
+    'end': (310,475),
+    'startEnd': [135,375,310,475],
+    'textPos': (145,435)
 }
 
 menu_item_5 = {
-    'start' : (355,375),
-    'end' : (555,475),
-    'startEnd' : (355,375,555,475)
+    'start': (330,375),
+    'end': (505,475),
+    'startEnd': [330,375,505,475],
+    'textPos': (340,435)
 }
 
 menu_shapes = [menu_item_0, menu_item_1, menu_item_2, menu_item_3, menu_item_4, menu_item_5, back_arrow, next_arrow]
 
 menu_item = []
-temp_menu = []
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-menu_item.append(temp_menu)
-temp_menu = []
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-temp_menu.append("if")
-menu_item.append(temp_menu)
+menu_item.append(["if","while","print","number","variable","not"]) #Page 0
+menu_item.append(["if","if","if","if","if","if"]) #Page 1
 
 menu_page = 0
+action = ""
 
 #Previous state
 palmsBool = False
@@ -115,13 +108,13 @@ while camera.isOpened():
         cv2.fillPoly(img,[menu_shapes[7]['pts']],(255,0,0))
         for i in range(6):
             img = cv2.rectangle(img,menu_shapes[i]['start'],menu_shapes[i]['end'],(128,0,0),-1)
-            img = cv2.putText(img,menu_item[menu_page][i],menu_shapes[i]['end'],cv2.FONT_HERSHEY_DUPLEX,1,(255,255,255))
+            img = cv2.putText(img,menu_item[menu_page][i],menu_shapes[i]['textPos'],cv2.FONT_HERSHEY_DUPLEX,1,(255,255,255))
         
         #Detect body parts
         palms = hand.detectMultiScale(gray, 1.3, 5)
         for (x,y,w,h) in palms:
             palmsCount += 1 #Counts how many hands have been detected
-            img = cv2.rectangle(img,(x,y),(x+w,y+h),(255,0,128),2)
+            img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,128,255),2)
         
         fists = fist.detectMultiScale(gray, 1.3, 5)
         for (x,y,w,h) in fists:
@@ -129,25 +122,31 @@ while camera.isOpened():
             img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,0),2)
         
         """
-        Gesture detection
+        #Gesture detection
         """
         #Palm turns to fist
         if palmsBool == True and fistsCount > 0:
             for (xFist,yFist,wFist,hFist) in fists:
-                img = cv2.putText(img,"Palm to Fist",(xFist,yFist),cv2.FONT_HERSHEY_DUPLEX,1,(255,255,0))
+                img = cv2.putText(img,"Palm to Fist",(xFist,yFist),cv2.FONT_HERSHEY_DUPLEX,1,(0,255,0))
                 xFistMiddle = xFist+(wFist/2)
                 yFistMiddle = yFist+(hFist/2)
-                for key, val in menu_shapes.items():
-                    xShapeStart = val['startEnd'][0]
-                    yShapeStart = val['startEnd'][1]
-                    xShapeEnd = val['startEnd'][2]
-                    yShapeEnd = val['startEnd'][3]
+                for i in range(len(menu_shapes)):
+                    xShapeStart = menu_shapes[i]['startEnd'][0]
+                    yShapeStart = menu_shapes[i]['startEnd'][1]
+                    xShapeEnd = menu_shapes[i]['startEnd'][2]
+                    yShapeEnd = menu_shapes[i]['startEnd'][3]
                     if (xFistMiddle > xShapeStart and xFistMiddle < xShapeEnd) and (yFistMiddle > yShapeStart and yFistMiddle < yShapeEnd):
-                        print(val)
-                        if "arrow" in val:
-                            play_obj = low_wav.play()
-                        else:
+                        if i < 6:
+                            #Menu option selected    
                             play_obj = high_wav.play()
+                            action = i
+                        else:
+                            #Arrow selected
+                            play_obj = low_wav.play()
+                            if i == 6:
+                                action = "back"
+                            elif i == 7:
+                                action = "next"
         """
         #
         """
@@ -159,7 +158,26 @@ while camera.isOpened():
             break
         
         """
-        Set variables for next stage of while loop
+        #Take action
+        """
+        if action == "back":
+            if menu_page > 0:
+                menu_page -= 1
+            else:
+                img = cv2.putText(img,"On first page",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,(0,0,255))
+                print("On first page")
+        elif action == "next":
+            if menu_page < len(menu_item)-1:
+                menu_page += 1
+            else:
+                img = cv2.putText(img,"On last page",(10,30),cv2.FONT_HERSHEY_DUPLEX,1,(0,0,255))
+                print("On last page")
+        """
+        #
+        """
+        
+        """
+        #Set variables for next stage of while loop
         """
         #If body part(s) detected set "previous state" boolean to true, if none set to false
         palmsBool = True if palmsCount > 0 else False
@@ -168,6 +186,7 @@ while camera.isOpened():
         #Clear current counts
         palmsCount = 0
         fistsCount = 0
+        action = ""
         """
         #
         """
